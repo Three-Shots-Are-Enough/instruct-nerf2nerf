@@ -3,6 +3,9 @@
 *.py[cod]
 *$py.class
 
+# dataset
+datasets/
+
 # C extensions
 *.so
 
