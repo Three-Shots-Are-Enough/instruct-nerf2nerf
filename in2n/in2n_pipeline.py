@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """InstructPix2Pix Pipeline and trainer"""
-
+import os
+import torchvision.utils as vutils
 from dataclasses import dataclass, field
 from itertools import cycle
 from typing import Optional, Type
@@ -57,6 +58,9 @@ class InstructNeRF2NeRFPipelineConfig(VanillaPipelineConfig):
     """Second device to place InstructPix2Pix on. If None, will use the same device as the pipeline"""
     ip2p_use_full_precision: bool = True
     """Whether to use full precision for InstructPix2Pix"""
+    save_edited_images: bool = False
+    output_dir: Optional[str] = None
+    """Directory to save edited images to"""
 
 class InstructNeRF2NeRFPipeline(VanillaPipeline):
     """InstructNeRF2NeRF pipeline"""
@@ -99,6 +103,13 @@ class InstructNeRF2NeRFPipeline(VanillaPipeline):
         self.guidance_scale_box = ViewerNumber(name="Text Guidance Scale", default_value=self.config.guidance_scale, cb_hook=self.guidance_scale_callback)
         self.image_guidance_scale_box = ViewerNumber(name="Image Guidance Scale", default_value=self.config.image_guidance_scale, cb_hook=self.image_guidance_scale_callback)
 
+    def save_edited_image(self, image, step, index):
+        """Save the edited image to disk"""
+        if hasattr(self.config, 'output_dir') and self.config.output_dir:
+            os.makedirs(self.config.output_dir, exist_ok=True)
+            filename = f"edited_image_step{step}_idx{index}.png"
+            save_path = os.path.join(self.config.output_dir, filename)
+            vutils.save_image(image.detach().cpu(), save_path)
 
     def guidance_scale_callback(self, handle: ViewerText) -> None:
         """Callback for guidance scale slider"""
@@ -172,7 +183,9 @@ class InstructNeRF2NeRFPipeline(VanillaPipeline):
                 # resize to original image size (often not necessary)
                 if (edited_image.size() != rendered_image.size()):
                     edited_image = torch.nn.functional.interpolate(edited_image, size=rendered_image.size()[2:], mode='bilinear')
-
+                # Save Images to output directory
+                if hasattr(self.config, 'save_edited_images') and self.config.save_edited_images:
+                    self.save_edited_image(edited_image, step, current_index.item())
                 # write edited image to dataloader
                 self.datamanager.image_batch["image"][current_spot] = edited_image.squeeze().permute(1,2,0)
 
