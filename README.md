@@ -101,6 +101,22 @@ To build off Instruct-NeRF2NeRF, we provide explanations of the core code compon
 
 `in2n.py`: We overwrite the `get_loss_dict` method to use LPIPs loss and L1Loss.
 
+# Rendering & View
+
+For Web GUI view (Viser Studio)
+```
+bash script/view_bear.sh
+```
+
+To get rendered file,
+```
+bash render_bear_<camera-view>.sh
+```
+
+- To get rendered mp4 frame images, you need to specify the camera view (spiral / interpolate / dataset / trajectory).
+- If you want to get specific parameters for each camera viewpoint, use `ns-render [option] --help`
+
+
 # Citation
 
 You can find our paper on [arXiv](https://arxiv.org/abs/2303.12789).
