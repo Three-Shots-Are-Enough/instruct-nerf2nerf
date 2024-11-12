@@ -116,6 +116,15 @@ bash render_bear_<camera-view>.sh
 - To get rendered mp4 frame images, you need to specify the camera view (spiral / interpolate / dataset / trajectory).
 - If you want to get specific parameters for each camera viewpoint, use `ns-render [option] --help`
 
+# Summary of Guidance
+
+'''
+1. Train Nerf (train_nerf_<name>.sh)
+2. Train I2N (train_i2n_<name>.sh)
+3. View or Render
+'''
+
+Caution: all of the sh files are intended to follow the latest version of trained nerf log. If you want to experiment in various parameters (guidance-scale & image-guidance-scale), you should reconstruct the bash file.
 
 # Citation
 
